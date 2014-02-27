@@ -4,15 +4,14 @@ package simulation;
 import dvms.log.Logger;
 import org.simgrid.msg.*;
 import org.simgrid.msg.Process;
-import org.simgrid.trace.Trace;
-import scheduling.dvms.DVMSMonitor;
-import scheduling.dvms.DVMSNode;
-import scheduling.dvms.DVMSServerForSG;
-import scheduling.dvms.ServerForSG;
 
-public class DVMSResolverV1 extends Process {
 
-    DVMSResolverV1(Host host, String name, String[] args) throws HostNotFoundException, NativeException  {
+/** This class is in charge of launching the latest version of DVMs (currently DVMS V2 implemented in SCALA)
+ * @author Jonathan Pastor
+ */
+public class DistributedResolver extends Process {
+
+    DistributedResolver(Host host, String name, String[] args) throws HostNotFoundException, NativeException  {
         super(host, name, args);
     }
 
@@ -21,24 +20,17 @@ public class DVMSResolverV1 extends Process {
             int port,//Information for associated DVMSServer
             String neighborHostname, int neighborPort){//Information for neighbor DVMSServer
 	
-		/* BEGIN DVMS V1 */
+/*        try {
 
-        Trace.hostVariableSet(Host.currentHost().getName(), "NB_MIG", 0);
-        Trace.hostVariableSet(Host.currentHost().getName(), "NB_MC", 0);
+            DVMSProcess dmvsProcess = new DVMSProcess( this.getHost(), nodeId, port, neighborHostname, neighborPort);
+            dmvsProcess.start();
 
-        ServerForSG neighbor = new ServerForSG(neighborHostname, neighborPort);
+            MonitorProcess monitorProcess = new MonitorProcess(SimulatorManager.getXHostByName(host.getName()), nodeId, port, dmvsProcess.self(), dmvsProcess);
+            monitorProcess.start();
 
-        DVMSNode node = new DVMSNode(nodeId, nbCPUs, cpuCapacity, memoryTotal, neighbor);
-        try {
-            DVMSMonitor monitorTask = new DVMSMonitor(this.getHost(), "monitor-"+nodeId, node);
-            monitorTask.start() ;
-
-            DVMSServerForSG serverTask = new DVMSServerForSG( this.getHost(), "communicator-"+nodeId, port, node, monitorTask);
-            serverTask.start();
             Msg.info("Agent "+nodeId+" started");
 
-            while (!Main.isEndOfInjection()) {
-                //	Msg.info("Resolver started and wait");
+            while (!SimulatorManager.isEndOfInjection()) {
                 waitFor(3);
 
             }
@@ -48,8 +40,7 @@ public class DVMSResolverV1 extends Process {
             Logger.flushAndClose();
             e.printStackTrace();
         }
-
-        /* END DVMS V1 */
+*/
     }
 
 
